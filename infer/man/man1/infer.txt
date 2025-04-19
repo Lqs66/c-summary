@@ -590,6 +590,14 @@ OPTIONS
            Activates: Output issues in (PMD) XML format (Conversely:
            --no-pmd-xml)           See also infer-run(1).
 
+       --pp
+           Activates: preanalysis for alias calculations (Conversely:
+           --no-pp)           See also infer-analyze(1).
+
+       --pp-only
+           Activates: Enable --pp and disable all other checkers (Conversely:
+           --no-pp-only)           See also infer-analyze(1).
+
        --previous-to-current-script shell
            Specify a script to checkout the current version of the project.
            The project is supposed to already be at that current version when

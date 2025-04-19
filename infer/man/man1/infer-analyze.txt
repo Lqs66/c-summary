@@ -204,6 +204,14 @@ OPTIONS
        --perf-profiler-data-file file
            Specify the file containing perf profiler data to read
 
+       --pp
+           Activates: preanalysis for alias calculations (Conversely:
+           --no-pp)
+
+       --pp-only
+           Activates: Enable --pp and disable all other checkers (Conversely:
+           --no-pp-only)
+
        --print-active-checkers
            Activates: Print the active checkers before starting the analysis
            (Conversely: --no-print-active-checkers)
