@@ -25,7 +25,7 @@ module ProcInfo = JavaGeneratorModels.ProcInfo
 
 (* generate_c_fn: when it is true, the generator will make '__C' package
  *   and generate summary for non-boundary C functions *)
-let option_generate_c_fn = false
+let option_generate_c_fn = true
 
 
 (* -- Util -- *)
@@ -407,12 +407,51 @@ let write_as_files base_dir result =
                close_out oc)
             result
 
+(* print_all_summaries: print all summaries with instructions *)
+let print_all_summaries () =
+  let procs = get_all_procs () in
+  Printf.printf "\n==== all funcs' summary and instructions ====\n";
+  List.iter (fun (proc, is_ent) ->
+    Printf.printf "\n===============================================\n";
+    let procname = InferIR.Typ.Procname.to_string proc in
+    Printf.printf "\nfunc name: %s (is entry: %B)\n" procname is_ent;
+    match Summary.get proc with
+    | Some s -> 
+        let attr = Summary.get_attributes s in
+        Printf.printf "ret type: %s\n" 
+          (InferIR.Typ.to_string attr.ret_type);
+        Printf.printf "args num: %d\n" 
+          (List.length attr.formals);
+        
+        (* print args *)
+        if List.length attr.formals > 0 then (
+          Printf.printf "args:\n";
+          List.iteri (fun i (name, typ) ->
+            Printf.printf "  arg %d: %s (type: %s)\n"
+              i
+              (InferIR.Mangled.to_string name)
+              (InferIR.Typ.to_string typ)
+          ) attr.formals
+        );
+        
+        (* print semantic_summary *)
+        (match s.Summary.payloads.Payloads.semantic_summary with
+        | Some (ss, gstore) -> 
+            let summary_str = Format.asprintf "%a" Domain.pp ss in
+            Printf.printf "summary:\n%s\n" summary_str;
+             
+        | None ->
+            Printf.printf "No semantic summary available\n");
+    | None ->
+        Printf.printf "No summary available\n";
+    
+    Printf.printf "\n===============================================\n"
+  ) procs
+
 (* MAIN *)
 let _ =
   print_string "## [JavaGenerator]\n";
   let result = generate () in
   write_as_files "java-gen-out" result;
-  () (*result
-  |> List.map (fun (_, _, cmpl) -> make_string cmpl)
-  |> String.concat "\n;;;\n"
-  |> print_string *)
+  (* print_all_summaries (); *)
+  ()

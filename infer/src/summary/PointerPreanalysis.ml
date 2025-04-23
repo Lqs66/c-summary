@@ -85,14 +85,14 @@ module AnalysisTargets = struct
     Marshal.to_channel oc targets' [];
     Pervasives.close_out oc
 
-  let is_targeted proc_name = 
-    if JniModel.is_jni proc_name then
+  let is_targeted proc_name = true (* Not just dealing with JNI functions *)
+    (* if JniModel.is_jni proc_name then
       false
     else if JniModel.is_callable_from_java proc_name then
       true
     else 
       let res = load_targets () in
-      Targets.mem proc_name res
+      Targets.mem proc_name res *)
 
   let add_target proc_name = 
     store_target proc_name 
@@ -334,8 +334,10 @@ let checker {Callbacks.proc_desc; tenv; summary} : Summary.t =
         (* TODO: record the result *)*)
         (*let () = L.progress "Final in %s: %a\n@." (Typ.Procname.to_string proc_name) Domain.pp (Domain.root_lift p) in*)
         let session = incr summary.Summary.sessions ; !(summary.Summary.sessions) in
-        (if JniModel.is_callable_from_java proc_name then
-          AliasReporter.store_aliases proc_name p);
+        (* Not just dealing with JNI functions *)
+        AliasReporter.store_aliases proc_name p;
+        (* (if JniModel.is_callable_from_java proc_name then
+          AliasReporter.store_aliases proc_name p); *)
         {summary with Summary.payloads = { summary.Summary.payloads with Payloads.pointer_preanalysis = Some p}; Summary.proc_desc = proc_desc; Summary.sessions = ref session}
     | None -> 
         summary)
